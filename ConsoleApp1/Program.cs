@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Remoting.Lifetime;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace ConsoleApp1
 {
@@ -116,6 +116,43 @@ namespace ConsoleApp1
             {
                 Console.WriteLine(homes.roomId);
                 Console.WriteLine(homes.name);
+            }
+
+
+            List<Home> homeAsParallel = new List<Home>()
+            {
+                new Home(1,"a"),
+                new Home(2,"b"),
+                new Home(3,"c"),
+                new Home(4,"d"),
+                new Home(2,"e"),
+                new Home(6,"f"),
+                new Home(1,"g"),
+
+            };
+
+
+            Console.WriteLine("並列書き換え");
+            /// 書き換えて戻り値を得る場合はこんな書き方するらしい。
+            /// .AsParallel()にすると早く計算できる模様。いい時代だなぁ。
+            List<(int, string)> homesSelectAsParallel =
+            homeAsParallel.Where(x => x.roomId >= 3).Select(x => (x.roomId = 1, x.name = "a")).AsParallel().ToList();
+
+
+            foreach ((int, string) eachHome in homesSelectAsParallel)
+            {
+                Console.WriteLine(eachHome.Item1);
+                Console.WriteLine(eachHome.Item2);
+            }
+
+
+            // メモリも書き換わることがわかる。ぽいんたみたいなかんじ
+            // 順序も保証されてるのか　すげえ
+            Console.WriteLine("書き換え後のList");
+            foreach (Home eachHome in homeAsParallel)
+            {
+                Console.WriteLine(eachHome.roomId);
+                Console.WriteLine(eachHome.name);
             }
 
 
